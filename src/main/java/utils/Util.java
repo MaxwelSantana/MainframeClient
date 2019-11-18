@@ -121,4 +121,12 @@ public final class Util {
             paramString = paramString.substring(1);
         return paramString;
     }
+
+    public static String toHex(byte paramByte) {
+        String s = "0x";
+        String str = Integer.toHexString(paramByte & 0xFF);
+        if (str.length() < 2)
+            s = String.valueOf(s) + "0";
+        return String.valueOf(s) + str;
+    }
 }

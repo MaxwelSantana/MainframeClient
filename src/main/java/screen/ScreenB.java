@@ -24,7 +24,7 @@ public class ScreenB extends ScreenBase {
         }
     }
 
-    void fora(int paramInt) { doa(paramInt); }
+    public void fora(int paramInt) { doa(paramInt); }
 
     protected ScreenB() {}
 

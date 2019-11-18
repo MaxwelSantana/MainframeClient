@@ -6,11 +6,12 @@ import exception.JagacyException;
 import conduit.AbstractConduit;
 import helper.MyHelperD;
 import screen.ScreenBase;
+import utils.ByteBuffer;
 import utils.Loggable;
 import utils.TerminalC;
 
-//com.jagacy.framework.f.class
-public abstract class ControllerF {
+//com.jagacy.framework.g.class
+public abstract class ControllerG {
 
     private int a6 = 25;
     private long a5;
@@ -30,7 +31,7 @@ public abstract class ControllerF {
     protected ScreenBase a1;
     private boolean a8;
 
-    protected ControllerF(JagacyProperties paramJagacyProperties, Loggable paramLoggable) {
+    protected ControllerG(JagacyProperties paramJagacyProperties, Loggable paramLoggable) {
         this.aZ = paramLoggable;
         this.a7 = new Config(paramJagacyProperties);
         this.a8 = chara();
@@ -154,5 +155,22 @@ public abstract class ControllerF {
             bool = true;
         }
         return bool;
+    }
+
+    protected void a(ByteBuffer paramByteBuffer) throws JagacyException {
+        this.aX = true;
+        this.a4 = this.a2;
+        this.a5 = this.a3;
+        this.aV = this.aW;
+        this.ba.send(paramByteBuffer);
+    }
+
+    public synchronized void a(int paramInt) throws JagacyException {
+        checkControllerIsOpen();
+        if (this.aX)
+            throw new JagacyException(11, "exception.keyboard.locked", true);
+        if (paramInt < 0 || paramInt >= this.a1.doa())
+        throw new IllegalArgumentException("Invalid cursor position: " + paramInt);
+        this.aY = paramInt;
     }
 }

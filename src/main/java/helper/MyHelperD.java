@@ -1,6 +1,6 @@
 package helper;
 
-import controller.ControllerF;
+import controller.ControllerG;
 import utils.Util;
 
 import java.util.Arrays;
@@ -11,9 +11,9 @@ public abstract class MyHelperD extends FeatureHelper {
 
     protected boolean[] ifa;
 
-    protected ControllerF a;
+    protected ControllerG a;
 
-    public abstract int newa(int paramInt);
+    public boolean newa(int paramInt) { return isFeature(this.doa[paramInt]); }
 
     protected static int a(int paramInt1, int paramInt2) {
         paramInt1 &= 0xFFFFFF;
@@ -27,7 +27,7 @@ public abstract class MyHelperD extends FeatureHelper {
         return paramInt1;
     }
 
-    protected MyHelperD(ControllerF paramf) {
+    protected MyHelperD(ControllerG paramf) {
         this.a = paramf;
         this.doa = new int[paramf.inta() * paramf.doa()];
         this.ifa = new boolean[this.doa.length];
@@ -47,7 +47,8 @@ public abstract class MyHelperD extends FeatureHelper {
 
     public boolean chara(int paramInt) { return !isHidden(this.doa[paramInt]); }
 
-    public boolean inta(int paramInt) { return isBold(this.doa[paramInt]); }
+    //public boolean inta(int paramInt) { return isBold(this.doa[paramInt]); }
+    public int inta(int paramInt) { return this.doa[paramInt]; }
 
     public boolean casea(int paramInt) { return isSelectable(this.doa[paramInt]); }
 
@@ -85,7 +86,9 @@ public abstract class MyHelperD extends FeatureHelper {
         }
     }
 
-    public int a(int paramInt) { return this.doa[paramInt]; }
+    //public int a(int paramInt) { return this.doa[paramInt]; }
+
+    public boolean a(int paramInt) { return isProtected(this.doa[paramInt]); }
 
     public abstract void doa(int paramInt1, int paramInt2);
 }

@@ -17,23 +17,20 @@ public final class MyHelperG extends MyHelperD {
     }
 
     public int gotoa(int paramInt) {
-        if (!trya(paramInt))
-        return -1;
-        byte b = 0;
-        if (ifa(paramInt))
-        b = (byte)(b | 0x20);
-        if (fora(paramInt))
-        b = (byte)(b | 0x10);
-        if (doa(paramInt))
-            //b = (byte)(b | true);
-        if (!chara(paramInt)) {
-            b = (byte)(b | 0xC);
-        } else if (inta(paramInt)) {
-            b = (byte)(b | 0x8);
-        } else if (casea(paramInt)) {
-            b = (byte)(b | 0x4);
+        int i = 0;
+        if (paramInt <= 0)
+            return i;
+        int j = doa();
+        if (paramInt > j)
+            paramInt = j;
+        while (--paramInt >= 0) {
+            i = this.doa[paramInt];
+            if (isFeature(i))
+                break;
+            i = 0;
+            paramInt--;
         }
-        return b;
+        return i;
     }
 
     public void doa(int paramInt1, int paramInt2) {
@@ -111,15 +108,15 @@ public final class MyHelperG extends MyHelperD {
         return i;
     }
 
-    int newa(int[] paramArrayOfint) { return a(65535, paramArrayOfint); }
+    public int newa(int[] paramArrayOfint) { return a(65535, paramArrayOfint); }
 
-    int fora(int[] paramArrayOfint) { return ifa(65535, paramArrayOfint); }
+    public int fora(int[] paramArrayOfint) { return ifa(65535, paramArrayOfint); }
 
-    int a(int[] paramArrayOfint) { return a(2, paramArrayOfint); }
+    public int a(int[] paramArrayOfint) { return a(2, paramArrayOfint); }
 
-    int ifa(int[] paramArrayOfint) { return ifa(2, paramArrayOfint); }
+    public int ifa(int[] paramArrayOfint) { return ifa(2, paramArrayOfint); }
 
-    int inta(int[] paramArrayOfint) {
+    public int inta(int[] paramArrayOfint) {
         int i = 0;
         int j = doa();
         if (paramArrayOfint[0] >= j - 1) {
@@ -173,7 +170,7 @@ public final class MyHelperG extends MyHelperD {
         return i;
     }
 
-    int casea(int[] paramArrayOfint) {
+    public int casea(int[] paramArrayOfint) {
         bytea(paramArrayOfint);
         return gotoa(paramArrayOfint[0]);
     }
@@ -195,16 +192,7 @@ public final class MyHelperG extends MyHelperD {
         return i;
     }
 
-    public int newa(int paramInt) {
-        if (trya(paramInt))
-        return this.doa[paramInt];
-        int i = longa(paramInt);
-        if (i == 0)
-            i = longa(doa());
-        return i;
-    }
-
-    void elsea(int paramInt) {
+    public void elsea(int paramInt) {
         this.doa[paramInt] = this.doa[paramInt] & 0xFFFFFFBF;
         this.doa[paramInt] = this.doa[paramInt] & 0xFFFFFF7F;
         this.doa[paramInt] = this.doa[paramInt] & 0xFFFFFFDF;

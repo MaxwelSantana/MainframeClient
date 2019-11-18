@@ -3,27 +3,25 @@ package controller;
 import config.JagacyProperties;
 import exception.JagacyException;
 import conduit.Conduit3270;
+import helper.FeatureHelper;
 import helper.MyHelperG;
 import screen.ScreenA;
 import screen.ScreenB;
 import screen.ScreenBase;
-import utils.IController;
-import utils.Key;
-import utils.Loggable;
-import utils.TerminalC;
+import utils.*;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 
 //com.jagacy.tn3270.h
-public class MyControllerH extends ControllerF implements IController {
+public class MyControllerH extends ControllerG implements IController {
 
     private static final byte[] bk = new byte[256];
     private static final byte[] bt = new byte[Key.MAX_ID];
     private int bf;
     private int bb;
     private MyHelperG bd;
-    private ScreenBase bh;
+    private ScreenB bh;
     private ScreenA bg;
     private boolean be;
     private boolean bp;
@@ -203,10 +201,482 @@ public class MyControllerH extends ControllerF implements IController {
     }
 
     protected int a(int paramInt1, int paramInt2, String paramString) throws JagacyException {
-        return 0;
+        byte b1 = 0;
+        ByteBuffer byteBuffer = this.ba.receive(paramInt1);
+        if (!this.bs.isEmulating()) {
+            int i = byteBuffer.getLength();
+            if (i > 0)
+                this.aZ.watch("NVT");
+            this.aX = false;
+            for (byte b2 = 0; b2 < i; b2++) {
+                byte b3 = byteBuffer.get();
+                b1++;
+                if (b3 == 13) {
+                    this.aY = this.aY / newa() * newa();
+                    this.a3++;
+                } else if (b3 == 10) {
+                    this.aY = (this.aY + newa()) % this.a1.doa();
+                    this.a3++;
+                } else {
+                    this.a1.a(this.aY++, b3);
+                    this.aW++;
+                }
+            }
+            this.bm = this.aY;
+        } else if (byteBuffer.getLength() > 0) {
+            boolean bool1 = false;
+            b1++;
+            if (this.bs.isSscpLu()) {
+                this.aZ.watch("SSCP-LU");
+                this.aX = false;
+                this.aY = this.bm = 0;
+                this.bj = this.bn = -1;
+            }
+            boolean bool2 = true;
+            byte b2 = byteBuffer.byteAt(0);
+            switch (b2) {
+                case 39:
+                    byteBuffer.get();
+                    byteBuffer.addStart(1);
+                    break;
+                case -15:
+                case 1:
+                    byteBuffer.get();
+                    this.aZ.watch("Write command");
+                    bool1 = true;
+                    break;
+                case 13:
+                case 126:
+                    byteBuffer.get();
+                    this.br = true;
+                    this.aZ.watch("Erase Write Alt command");
+                    j();
+                    bool1 = true;
+                    break;
+                case -11:
+                case 5:
+                    byteBuffer.get();
+                    this.br = false;
+                    this.aZ.watch("Erase Write command");
+                    j();
+                    bool1 = true;
+                    break;
+                case 15:
+                case 111:
+                    byteBuffer.get();
+                    this.aZ.watch("Erase Unprotected command");
+                    fora(0, this.a1.doa());
+                    this.a9.ifa();
+                    this.aX = false;
+                    g();
+                    this.bm = this.aY;
+                    this.a3++;
+                    break;
+                case -14:
+                case 2:
+                    byteBuffer.get();
+                    this.aZ.watch("Read Buffer command");
+                    doa((byte)96);
+                    break;
+                case -10:
+                case 6:
+                    byteBuffer.get();
+                    this.aZ.watch("Read Modified command");
+                    fora((byte)96);
+                    break;
+                case 110:
+                    byteBuffer.get();
+                    this.aZ.watch("Read Modified All command");
+                    fora((byte)96);
+                    break;
+                case -13:
+                case 17:
+                    byteBuffer.get();
+                    this.aZ.watch("Write structured field command");
+                    inta(byteBuffer);
+                    return b1;
+                case 3:
+                    byteBuffer.get();
+                    this.aZ.watch("NOP command");
+                    return b1;
+                default:
+                    if (!this.bs.isSscpLu()) {
+                        byteBuffer.get();
+                        this.aZ.watch("Invalid command " + Util.toHex(b2));
+                        break;
+                    }
+                    bool2 = false;
+                    this.br = true;
+                    j();
+                    bool1 = true;
+                    break;
+            }
+            if (!bool1) {
+                if (byteBuffer.getLength() > 0)
+                    this.aZ.watch("Extra data at end of command");
+            } else if (byteBuffer.getLength() > 0) {
+                if (bool2)
+                    doa(byteBuffer);
+                fora(byteBuffer);
+            }
+        }
+        return b1;
+    }
+
+    private void j() {
+        this.a1.a();
+        this.a9.fora();
+        this.aW++;
+        this.aY = this.bm = 0;
+        this.a3++;
+    }
+
+    public synchronized void g() throws JagacyException {
+        int i;
+        checkControllerIsOpen();
+        if (this.aX)
+            throw new JagacyException(11, "exception.keyboard.locked", true);
+        int[] arrayOfInt = { -1 };
+        this.aY = 0;
+        int j = this.a1.doa();
+        do {
+            i = this.bd.ifa(arrayOfInt);
+            if (i != 0)
+                this.aY = arrayOfInt[0] + 1;
+            if (this.aY >= j) {
+                this.aY %= j;
+                break;
+            }
+        } while (i != 0 && this.a9.newa(this.aY));
+        if (this.a9.newa(this.aY))
+        this.aY = 0;
+    }
+
+
+    public synchronized int ifa(int[] paramArrayOfint) throws JagacyException {
+        checkControllerIsOpen();
+        return this.bd.casea(paramArrayOfint);
+    }
+
+    private void fora(ByteBuffer paramByteBuffer) throws JagacyException {
+
     }
 
     protected void doa(String paramString) throws JagacyException {
 
+    }
+
+    private void doa(byte paramByte) throws JagacyException {
+        ByteBuffer byteBuffer = new ByteBuffer(this.a1.doa() * 2);
+        byteBuffer.appendEscape(paramByte);
+        a(this.aY, byteBuffer);
+        byte b1 = 0;
+        int i = this.a1.doa();
+        while (b1 < i) {
+            if (this.a9.newa(b1)) {
+                byteBuffer.appendEscape((byte)29);
+                //byteBuffer.appendEscape(n[this.bd.elsea(b1) & 0x3F]);
+            } else {
+                byteBuffer.appendEscape(this.a1.a(b1));
+            }
+            b1++;
+        }
+        a(byteBuffer);
+    }
+
+    private void a(int paramInt, ByteBuffer paramByteBuffer) {
+        int i = paramInt / n.length % n.length;
+        paramByteBuffer.appendEscape(n[i]);
+        i = paramInt % n.length;
+        paramByteBuffer.appendEscape(n[i]);
+    }
+
+    private void fora(int paramInt1, int paramInt2) {
+        boolean bool = false;
+        if (!this.a9.inta()) {
+            bool = true;
+        } else if (!this.a9.newa(paramInt1)) {
+            bool = FeatureHelper.isProtected(this.a9.inta(paramInt1)) ? false : true;
+        }
+        int i = this.a1.doa();
+        while (paramInt1 < i || paramInt2 != 0) {
+            paramInt1 %= i;
+            if (this.a9.newa(paramInt1)) {
+                bool = this.a9.a(paramInt1) ? false : true;
+            } else if (bool) {
+                this.bh.fora(paramInt1);
+            }
+            if (++paramInt1 == paramInt2)
+                break;
+        }
+    }
+
+    private void fora(byte paramByte) throws JagacyException {
+        byte b1 = -3;
+        byte b2 = -2;
+        byte b3 = -1;
+        boolean bool = false;
+        ByteBuffer byteBuffer = new ByteBuffer(this.a1.doa() * 2);
+        if ((!this.bs.isEmulating() || this.bs.isSscpLu()) && !this.a9.inta()) {
+            for (int j = this.bj; j < this.bn; j++)
+                byteBuffer.append(this.a1.a(j));
+            a(byteBuffer);
+            return;
+        }
+        byteBuffer.appendEscape(paramByte);
+        a(this.aY, byteBuffer);
+        byte b4 = -3;
+        if (!this.a9.inta())
+        b4 = -2;
+        byte b5 = 0;
+        byte b6 = 0;
+        int i = this.a1.doa();
+        while (b6 < i) {
+            if (this.a9.newa(b6)) {
+                b4 = -3;
+                if (this.a9.ifa(b6))
+                b4 = b6;
+            } else if (b4 != -3) {
+                b5 = this.a1.a(b6);
+                if (b4 >= 0) {
+                    byteBuffer.appendEscape((byte)17);
+                    a((b4 + 1) % i, byteBuffer);
+                    b4 = -1;
+                }
+                if (b5 != 0)
+                    byteBuffer.appendEscape(b5);
+            }
+            b6++;
+        }
+        if (b4 >= -1) {
+            b6 = 0;
+            i = this.a1.doa();
+            while (b6 < i && !this.a9.newa(b6)) {
+                b5 = this.a1.a(b6);
+                if (b4 >= 0) {
+                    byteBuffer.appendEscape((byte)17);
+                    a((b4 + 1) % i, byteBuffer);
+                    b4 = -1;
+                }
+                if (b5 != 0)
+                    byteBuffer.appendEscape(b5);
+                b6++;
+            }
+        }
+        a(byteBuffer);
+    }
+
+    private void doa(ByteBuffer paramByteBuffer) throws JagacyException {
+        byte b1 = paramByteBuffer.get();
+        byte b2 = bk[b1 & 0xFF];
+        if (b2 == -1)
+            b2 = b1;
+        if ((b2 & 0x4) != 0) {
+            this.aZ.watch("Alarm sounded");
+            this.a2++;
+        }
+        if ((b2 & 0x2) != 0) {
+            this.aZ.watch("Keyboard restored");
+            this.aX = false;
+        }
+        if ((b2 & 0x1) != 0) {
+            this.aZ.watch("All MDT reset");
+            this.a9.a();
+        }
+    }
+
+    private void newa(ByteBuffer paramByteBuffer) throws JagacyException {
+        this.aZ.watch("Sending Query Reply");
+        paramByteBuffer.append((byte)-120);
+        for (byte b1 = 0; b1 < this.bc.length; b1++)
+            a(this.bc[b1], paramByteBuffer);
+        this.ba.send(paramByteBuffer);
+        this.aX = true;
+    }
+
+    private void a(ByteBuffer paramByteBuffer, int paramInt) throws JagacyException {
+        ByteBuffer byteBuffer = new ByteBuffer(256);
+        byte b1 = 0;
+        byte b2 = paramByteBuffer.get();
+        byte b3 = paramByteBuffer.get();
+        paramInt -= 2;
+        switch (b3) {
+            case 2:
+                this.aZ.watch("Query");
+                newa(byteBuffer);
+                this.aX = true;
+                paramByteBuffer.addStart(paramInt);
+                return;
+            case 3:
+                this.aZ.watch("QueryList");
+                if (b2 != -1) {
+                    paramByteBuffer.addStart(paramInt);
+                } else {
+                    byte b5;
+                    byte b4 = paramByteBuffer.get();
+                    paramInt--;
+                    byteBuffer.append((byte)-120);
+                    switch (b4) {
+                        case 0:
+                            this.aZ.watch("List");
+                            for (b5 = 0; b5 < paramInt; b5++) {
+                                int i = Util.indexOf(paramByteBuffer.get(), this.bc);
+                                if (i != -1) {
+                                    a(this.bc[i], byteBuffer);
+                                    b1++;
+                                }
+                            }
+                            if (b1 <= 0)
+                                a((short)-1, byteBuffer);
+                            break;
+                        case 64:
+                            this.aZ.watch("Equivalent+List");
+                            paramByteBuffer.addStart(paramInt);
+                            for (b5 = 0; b5 < this.bc.length; b5++)
+                                a(this.bc[b5], byteBuffer);
+                            break;
+                        case -128:
+                            this.aZ.watch("All\n");
+                            paramByteBuffer.addStart(paramInt);
+                            for (b5 = 0; b5 < this.bc.length; b5++)
+                                a(this.bc[b5], byteBuffer);
+                            break;
+                        default:
+                            this.aZ.watch("Unknown Query List Type " + Util.toHex(b4));
+                            paramByteBuffer.addStart(paramInt);
+                            break;
+                    }
+                    this.ba.send(byteBuffer);
+                    this.aX = true;
+                }
+                return;
+            case 110:
+                this.aZ.watch("ReadModifiedAll");
+                if (b2 == 0)
+                    fora((byte)97);
+                paramByteBuffer.addStart(paramInt);
+                return;
+            case -14:
+                this.aZ.watch("ReadBuffer");
+                if (b2 == 0)
+                    doa((byte)97);
+                paramByteBuffer.addStart(paramInt);
+                return;
+            case -10:
+                this.aZ.watch("ReadModified");
+                if (b2 == 0)
+                    fora((byte)97);
+                paramByteBuffer.addStart(paramInt);
+                return;
+        }
+        this.aZ.watch("Unknown WSF Command " + Util.toHex(b3));
+        paramByteBuffer.addStart(paramInt);
+    }
+
+    private void ifa(ByteBuffer paramByteBuffer) throws JagacyException {
+        byte b1 = paramByteBuffer.get();
+        switch (b1) {
+            case 0:
+                this.br = false;
+                this.aZ.watch("Default");
+                j();
+                return;
+            case -128:
+                this.br = true;
+                this.aZ.watch("Alternate");
+                j();
+                return;
+        }
+        this.aZ.watch("Unknown type " + Util.toHex(b1));
+    }
+
+    private void inta(ByteBuffer paramByteBuffer) throws JagacyException {
+        while (paramByteBuffer.getLength() > 0) {
+            int i = ((paramByteBuffer.get() & 0xFF) << 8) + (paramByteBuffer.get() & 0xFF);
+            if (i == 0) {
+                i = paramByteBuffer.getLength();
+            } else {
+                i -= 2;
+            }
+            byte b1 = paramByteBuffer.get();
+            i--;
+            switch (b1) {
+                case 1:
+                    this.aZ.watch("ReadPartition");
+                    a(paramByteBuffer, i);
+                    continue;
+                case 3:
+                    this.aZ.watch("EraseReset");
+                    ifa(paramByteBuffer);
+                    continue;
+                case 9:
+                    this.aZ.watch("SetReplyMode");
+                    paramByteBuffer.addStart(i);
+                    continue;
+                case 12:
+                    this.aZ.watch("CreatePartition");
+                    paramByteBuffer.addStart(i);
+                    a(0);
+                    continue;
+                case 64:
+                    this.aZ.watch("OutboundDS");
+                    ifa(paramByteBuffer, i);
+                    continue;
+            }
+            this.aZ.watch("Unsupported structured field command " + Util.toHex(b1));
+            ByteBuffer byteBuffer = new ByteBuffer(3);
+            byteBuffer.append((byte)-120);
+            byteBuffer.append((byte)0);
+            byteBuffer.append((byte)0);
+            this.ba.send(byteBuffer);
+            paramByteBuffer.addStart(i);
+        }
+    }
+
+    private void ifa(ByteBuffer paramByteBuffer, int paramInt) throws JagacyException {
+        byte b1 = paramByteBuffer.get();
+        paramInt--;
+        if (b1 != 0) {
+            this.aZ.trace("Invalid partition " + Util.toHex(b1));
+            paramByteBuffer.addStart(paramInt);
+            return;
+        }
+        byte b2 = paramByteBuffer.get();
+        paramInt--;
+        switch (b2) {
+            case -15:
+                this.aZ.watch("Write");
+                doa(paramByteBuffer);
+                if (--paramInt > 0)
+                    fora(paramByteBuffer.getBuffer(paramInt));
+                return;
+            case 126:
+                this.br = true;
+                this.aZ.watch("EraseWriteAlternate");
+                j();
+                doa(paramByteBuffer);
+                if (--paramInt > 0)
+                    fora(paramByteBuffer.getBuffer(paramInt));
+                return;
+            case -11:
+                this.br = false;
+                this.aZ.watch("EraseWrite");
+                j();
+                doa(paramByteBuffer);
+                if (--paramInt > 0)
+                    fora(paramByteBuffer.getBuffer(paramInt));
+                return;
+            case 111:
+                this.aZ.watch("EraseAllUnprotected");
+                fora(0, this.a1.doa());
+                this.a9.ifa();
+                this.aX = false;
+                g();
+                this.bm = this.aY;
+                this.a3++;
+                return;
+        }
+        this.aZ.watch("Unknown type " + Util.toHex(b2));
+        paramByteBuffer.addStart(paramInt);
     }
 }

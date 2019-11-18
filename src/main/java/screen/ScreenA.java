@@ -146,7 +146,7 @@ public class ScreenA extends ScreenB {
         this.casea[paramInt] = bool;
     }
 
-    void fora(int paramInt) {
+    public void fora(int paramInt) {
         super.fora(paramInt);
         //boolean bool = inta(paramInt) ? true : false;
         int bool = inta(paramInt) ? 1 : 0;

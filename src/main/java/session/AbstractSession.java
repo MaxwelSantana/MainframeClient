@@ -2,7 +2,7 @@ package session;
 
 import config.Config;
 import config.JagacyProperties;
-import controller.ControllerF;
+import controller.ControllerG;
 import exception.JagacyException;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
@@ -17,7 +17,7 @@ import java.util.Properties;
 //AbstractSession.class
 public abstract class AbstractSession {
 
-    ControllerF myController;
+    ControllerG myController;
 
     JagacyProperties myProperties;
 
@@ -59,7 +59,7 @@ public abstract class AbstractSession {
         this.a.start();
     }
 
-    abstract ControllerF createModel(JagacyProperties paramJagacyProperties, Loggable paramLoggable) throws JagacyException;
+    abstract ControllerG createModel(JagacyProperties paramJagacyProperties, Loggable paramLoggable) throws JagacyException;
 
     public int getWidth() { return this.myController.newa(); }
 

@@ -1,7 +1,7 @@
 package session;
 
 import config.JagacyProperties;
-import controller.ControllerF;
+import controller.ControllerG;
 import controller.MyControllerH;
 import exception.JagacyException;
 import utils.Loggable;
@@ -16,7 +16,7 @@ public class Session3270 extends AbstractSession {
 
     public Session3270(String paramString) throws JagacyException { this(paramString, null); }
 
-    ControllerF createModel(JagacyProperties paramJagacyProperties, Loggable paramLoggable) throws JagacyException {
+    ControllerG createModel(JagacyProperties paramJagacyProperties, Loggable paramLoggable) throws JagacyException {
         return new MyControllerH(paramJagacyProperties, paramLoggable);
     }
 }

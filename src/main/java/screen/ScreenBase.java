@@ -1,6 +1,6 @@
 package screen;
 
-import controller.ControllerF;
+import controller.ControllerG;
 import exception.JagacyException;
 
 import java.util.Arrays;
@@ -8,11 +8,11 @@ import java.util.Arrays;
 public abstract class ScreenBase {
     protected byte[] doa;
 
-    protected ControllerF a;
+    protected ControllerG a;
 
     protected CodePage fora;
 
-    protected ScreenBase(ControllerF paramf) {
+    protected ScreenBase(ControllerG paramf) {
         this.a = paramf;
         this.doa = new byte[paramf.inta() * paramf.doa()];
     }
