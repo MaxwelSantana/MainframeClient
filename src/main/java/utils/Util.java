@@ -20,7 +20,7 @@ public final class Util {
     }
 
     public static boolean isEmpty(int[] paramArrayOfint) {
-        for (byte b = 0; b < paramArrayOfint.length; b++) {
+        for (int b = 0; b < paramArrayOfint.length; b++) {
             if (paramArrayOfint[b] != 0)
                 return false;
         }

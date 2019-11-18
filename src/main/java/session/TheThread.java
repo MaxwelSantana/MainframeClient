@@ -1,6 +1,6 @@
 package session;
 
-import controller.Controller;
+import controller.ControllerF;
 import exception.JagacyException;
 
 //com.jagacy.util.e.class
@@ -9,9 +9,9 @@ public final class TheThread extends Thread {
 
     private int doa;
 
-    private Controller ifa;
+    private ControllerF ifa;
 
-    public TheThread(Controller paramf) {
+    public TheThread(ControllerF paramf) {
         this.ifa = paramf;
         this.doa = this.ifa.b().getTimeout("jagacy.keepalive.seconds", 300000);
         setDaemon(true);

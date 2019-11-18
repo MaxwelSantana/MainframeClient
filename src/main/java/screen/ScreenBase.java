@@ -1,22 +1,23 @@
-package controller;
+package screen;
 
+import controller.ControllerF;
 import exception.JagacyException;
 
 import java.util.Arrays;
 
-public class ScreenInfo {
+public abstract class ScreenBase {
     protected byte[] doa;
 
-    protected Controller a;
+    protected ControllerF a;
 
-    protected CodepageInfo fora;
+    protected CodePage fora;
 
-    protected ScreenInfo(Controller paramf) {
+    protected ScreenBase(ControllerF paramf) {
         this.a = paramf;
-        //this.do = new byte[paramf.int() * paramf.do()];
+        this.doa = new byte[paramf.inta() * paramf.doa()];
     }
 
-    protected ScreenInfo() {}
+    protected ScreenBase() {}
 
     public void a(int paramInt, byte paramByte) throws JagacyException { this.doa[paramInt] = paramByte; }
 

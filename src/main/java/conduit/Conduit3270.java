@@ -2,11 +2,21 @@ package conduit;
 
 import exception.JagacyException;
 import utils.ByteBuffer;
-import utils.Terminal;
+import utils.TerminalC;
 import utils.Util;
 
-import java.io.*;
-import java.net.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.Socket;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 
 public class Conduit3270 extends AbstractConduit {
@@ -42,14 +52,14 @@ public class Conduit3270 extends AbstractConduit {
 
     private static final byte[] k = new byte[] { -1, -6, 40, 3, 4 };
 
-    protected Socket getSocket(InetAddress paramInetAddress, int paramInt1, int paramInt2) throws Exception {
+    protected Socket getSocket(InetAddress paramInetAddress, int paramInt1, int paramInt2) throws Exception, JagacyException {
         Socket socket = new Socket();
         InetSocketAddress inetSocketAddress = new InetSocketAddress(paramInetAddress, paramInt1);
         socket.connect(inetSocketAddress, paramInt2);
         return socket;
     }
 
-    protected Socket getSocket(Proxy paramProxy, InetAddress paramInetAddress, int paramInt1, int paramInt2) throws Exception {
+    protected Socket getSocket(Proxy paramProxy, InetAddress paramInetAddress, int paramInt1, int paramInt2) throws Exception, JagacyException {
         Socket socket = new Socket(paramProxy);
         InetSocketAddress inetSocketAddress = new InetSocketAddress(paramInetAddress, paramInt1);
         socket.connect(inetSocketAddress, paramInt2);
@@ -59,7 +69,7 @@ public class Conduit3270 extends AbstractConduit {
     protected void reopen() throws JagacyException {}
 
     public void open() throws JagacyException {
-        this.myTerminal = Terminal.s;
+        this.myTerminal = TerminalC.s;
         init();
         boolean bool = this.myCfg.getParam("jagacy.ssl", false);
         int i = bool ? 992 : 23;
@@ -106,7 +116,7 @@ public class Conduit3270 extends AbstractConduit {
     }
 
     void open(InputStream paramInputStream, OutputStream paramOutputStream) throws JagacyException {
-        this.myTerminal = Terminal.s;
+        this.myTerminal = TerminalC.s;
         init();
         this.myInput = new BufferedInputStream(paramInputStream, 8192);
         this.myOutput = new BufferedOutputStream(paramOutputStream, 8192);
@@ -445,7 +455,7 @@ public class Conduit3270 extends AbstractConduit {
                             this.I = true;
                             if (this.myTerminal.toString().contains("3279")) {
                                 String str = this.myTerminal.toString().replace('9', '8');
-                                this.myTerminal = Terminal.getTerminal(str);
+                                this.myTerminal = TerminalC.getTerminal(str);
                                 byteBuffer1.append((byte)-6);
                                 byteBuffer1.append((byte)40);
                                 byteBuffer1.append((byte)2);

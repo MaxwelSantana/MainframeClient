@@ -2,19 +2,22 @@ package session;
 
 import config.Config;
 import config.JagacyProperties;
-import controller.Controller;
+import controller.ControllerF;
 import exception.JagacyException;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
+import ui.UserInterface;
 import utils.Loggable;
 import utils.Logger;
+import utils.Util;
 
+import java.util.Date;
 import java.util.Properties;
 
 //AbstractSession.class
 public abstract class AbstractSession {
 
-    Controller myController;
+    ControllerF myController;
 
     JagacyProperties myProperties;
 
@@ -36,6 +39,8 @@ public abstract class AbstractSession {
 
     boolean myIsInsert;
 
+    UserInterface myUi;
+
     AbstractSession(String paramString, Properties paramProperties) throws JagacyException {
         this.inta = paramString;
         this.myProperties = new JagacyProperties(this.inta, paramProperties);
@@ -54,7 +59,7 @@ public abstract class AbstractSession {
         this.a.start();
     }
 
-    abstract Controller createModel(JagacyProperties paramJagacyProperties, Loggable paramLoggable) throws JagacyException;
+    abstract ControllerF createModel(JagacyProperties paramJagacyProperties, Loggable paramLoggable) throws JagacyException;
 
     public int getWidth() { return this.myController.newa(); }
 
@@ -111,6 +116,11 @@ public abstract class AbstractSession {
         throw new JagacyException(4, "exception.session.closed", true);
     }
 
+    void checkLogoff() throws JagacyException {
+        if (this.newa != null && this.newa != Thread.currentThread())
+            throw new JagacyException(14, "Application is logging off");
+    }
+
     public synchronized void close() throws JagacyException {
         try {
             if (this.a != null)
@@ -148,8 +158,8 @@ public abstract class AbstractSession {
     }
 
     public String readPosition(int paramInt1, int paramInt2, int paramInt3) throws JagacyException {
-        //checkOpen();
-        //checkLogoff();
+        checkOpen();
+        checkLogoff();
         if (paramInt1 < 0 || paramInt1 >= getHeight())
             throw new IllegalArgumentException("Invalid row: " + paramInt1);
         if (paramInt2 < 0 || paramInt2 >= getWidth())
@@ -159,7 +169,116 @@ public abstract class AbstractSession {
         if (paramInt3 == 0)
             return "";
         int i = paramInt1 * getWidth() + paramInt2;
-        return new String(this.myController.a(i, paramInt3));
+
+        char[] teste = this.myController.a(i, paramInt3);
+        return new String(teste);
     }
 
+    public boolean waitForPosition(int i, int j, String s, int k) throws JagacyException {
+        if (i < 0 || i >= getHeight())
+            throw new IllegalArgumentException((new StringBuilder("Invalid row: ")).append(i).toString());
+        if (j < 0 || j >= getWidth())
+            throw new IllegalArgumentException((new StringBuilder("Invalid column: ")).append(j).toString());
+        if (k < 0)
+            throw new IllegalArgumentException((new StringBuilder("Invalid timeout: ")).append(k).toString());
+        if (Util.isEmpty(s))
+            throw new IllegalArgumentException("Empty value");
+        int l = s.length();
+        String s1 = readPosition(i, j, l);
+        if (s.equals(s1))
+            return true;
+        for (int i1 = 0; i1 < k; i1 += 100) {
+            waitForChange(100);
+            String s2 = readPosition(i, j, l);
+            if (s.equals(s2))
+                return true;
+        }
+
+        if (k != 100)
+            myLogger.warn("Possible intermediate screen");
+        return false;
+    }
+
+    public boolean waitForChange(int i) throws JagacyException {
+        if (i < 0)
+            throw new IllegalArgumentException((new StringBuilder("Invalid timeout: ")).append(i).toString());
+        else
+            return wait(i, 0, null);
+    }
+
+    boolean wait(int paramInt1, int paramInt2, String paramString) throws JagacyException {
+        checkOpen();
+        checkLogoff();
+        int i = paramInt1;
+        this.a.a();
+        boolean bool = this.myController.ifa();
+        if (!bool)
+            while (paramInt1 > 0) {
+                long l1 = (new Date()).getTime();
+                try {
+                    this.myController.ifa(paramInt1, paramInt2, paramString);
+                } catch (JagacyException jagacyException) {
+                    if (jagacyException.getError() == 16 && this.myCfg.getParam("jagacy.autoReconnect", false)) {
+                        abort();
+                        if (this.myUi != null) {
+                            this.myUi.resetTime();
+                            try {
+                                this.myUi.update();
+                            } catch (JagacyException jagacyException1) {}
+                        }
+                        open();
+                    } else {
+                        throw jagacyException;
+                    }
+                }
+                if (this.myUi != null)
+                    try {
+                        this.myUi.update();
+                    } catch (JagacyException jagacyException) {}
+                bool = this.myController.ifa();
+                if (bool)
+                    break;
+                long l2 = (new Date()).getTime();
+                paramInt1 = (int)(paramInt1 - l2 - l1);
+            }
+        this.myController.voida();
+        if (this.myUi != null) {
+            if (bool)
+                this.myUi.endTime();
+            try {
+                this.myUi.update();
+            } catch (JagacyException jagacyException) {}
+        }
+        if (!bool && i != 100 && paramInt2 <= 0 && paramString == null)
+            this.myLogger.warn("Possible intermediate screen");
+        return bool;
+    }
+
+    public synchronized void abort() {
+        if (this.fora) {
+            this.myLogger.watch("Abort session");
+            try {
+                close();
+            } catch (JagacyException jagacyException) {}
+        }
+    }
+
+    public char[] readScreenText() throws JagacyException {
+        checkOpen();
+        checkLogoff();
+        return myController.a(0, getWidth() * getHeight());
+    }
+
+    public String[] readScreen() throws JagacyException {
+        int i = getHeight();
+        String as[] = new String[i];
+        for (int j = 0; j < i; j++)
+            as[j] = readRow(j);
+
+        return as;
+    }
+
+    public JagacyProperties getProperties() {
+        return myProperties;
+    }
 }

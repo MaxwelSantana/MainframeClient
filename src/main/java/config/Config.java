@@ -6,6 +6,7 @@ import exception.JagacyException;
 import java.util.HashMap;
 import java.util.Map;
 
+//com.jagacy.util.d
 public class Config {
     private Map a1 = new HashMap<Object, Object>();
 

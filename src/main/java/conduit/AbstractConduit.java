@@ -5,7 +5,7 @@ import exception.JagacyException;
 import utils.ByteBuffer;
 import utils.Loggable;
 import utils.Logger;
-import utils.Terminal;
+import utils.TerminalC;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -29,7 +29,7 @@ public abstract class AbstractConduit {
 
     protected Object myMutex = new Object();
 
-    protected Terminal myTerminal;
+    protected TerminalC myTerminal;
 
     public abstract void open() throws JagacyException;
 
@@ -99,7 +99,7 @@ public abstract class AbstractConduit {
     protected AbstractConduit() { a(); }
 
     private void a() {
-        this.myTerminal = Terminal.d;
+        this.myTerminal = TerminalC.d;
         /*
         this.a = this.myTerminal.new();
         this.if = this.myTerminal.try();
@@ -111,13 +111,13 @@ public abstract class AbstractConduit {
 
     public final void setCfg(Config paramd) { this.myCfg = paramd; }
 
-    public Terminal getTerminal() { return this.myTerminal; }
+    public TerminalC getTerminal() { return this.myTerminal; }
 
     protected void init() throws JagacyException {
         if (this.myInput != null)
             throw new JagacyException(1, "Conduit is already open");
         String str = this.myCfg.getParam("jagacy.terminal", this.myTerminal.toString()).trim();
-        this.myTerminal = Terminal.getTerminal(str);
+        this.myTerminal = TerminalC.getTerminal(str);
         if (this.myTerminal == null)
             throw new JagacyException(1, "Unknown terminal type " + str);
         //this.myLogger.trace("Opening conduit, terminal=" + this.myTerminal);

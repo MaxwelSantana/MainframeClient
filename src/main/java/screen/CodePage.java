@@ -1,13 +1,14 @@
-package controller;
+package screen;
 
 import exception.JagacyException;
 
 import java.io.UnsupportedEncodingException;
 
-public class CodepageInfo {
+//com.jagacy.framework.g
+public class CodePage {
     private String a;
 
-    public CodepageInfo(String paramString) throws JagacyException {
+    public CodePage(String paramString) throws JagacyException {
         this.a = paramString.toUpperCase();
         a(" ");
     }

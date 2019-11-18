@@ -3,23 +3,28 @@ package controller;
 import config.JagacyProperties;
 import exception.JagacyException;
 import conduit.Conduit3270;
+import helper.MyHelperG;
+import screen.ScreenA;
+import screen.ScreenB;
+import screen.ScreenBase;
 import utils.IController;
 import utils.Key;
 import utils.Loggable;
+import utils.TerminalC;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 
 //com.jagacy.tn3270.h
-public class MyController extends Controller implements IController {
+public class MyControllerH extends ControllerF implements IController {
 
     private static final byte[] bk = new byte[256];
     private static final byte[] bt = new byte[Key.MAX_ID];
     private int bf;
     private int bb;
-    //private g bd;
-    //private b bh;
-    //private a bg;
+    private MyHelperG bd;
+    private ScreenBase bh;
+    private ScreenA bg;
     private boolean be;
     private boolean bp;
     private int bq;
@@ -33,7 +38,7 @@ public class MyController extends Controller implements IController {
     private int bj;
     private int bn;
 
-    public MyController(JagacyProperties paramJagacyProperties, Loggable paramLoggable) throws JagacyException {
+    public MyControllerH(JagacyProperties paramJagacyProperties, Loggable paramLoggable) throws JagacyException {
         super(paramJagacyProperties, paramLoggable);
         paramJagacyProperties.set("jagacy.product", "3270");
         paramJagacyProperties.set("jagacy.version", "5.3.3");
@@ -121,18 +126,80 @@ public class MyController extends Controller implements IController {
         String str = "conduit.Conduit3270";
         //String str = "com.jagacy.tn3270.Conduit3270";
         if (this.a7.getParam("jagacy.ssl", false))
-            str = "conduit.Conduit3270";
+            str = "conduit.SslConduit3270";
             //str = "com.jagacy.tn3270.SslConduit3270";
         return str;
     }
 
-    protected void e() throws JagacyException {
-
+    protected void initAuxClasses() throws JagacyException {
+        this.br = false;
+        this.bs = (Conduit3270)this.ba;
+        this.bp = this.a7.getParam().getBoolean("showHiddenFields", false);
+        this.bd = new MyHelperG(this);
+        if (this.a7.getParam("jagacy.dbcs", false)) {
+            this.bh = this.bg = new ScreenA(this, this.a7, this.aZ);
+            if ((this.bs.getTerminalFlags() & TerminalC.elsea) == 0) {
+                this.bc = B;
+            } else {
+                this.bc = z;
+            }
+        } else {
+            this.bh = new ScreenB(this, this.a7, this.aZ);
+            if ((this.bs.getTerminalFlags() & TerminalC.elsea) == 0) {
+                this.bc = f;
+            } else {
+                this.bc = d;
+            }
+        }
+        this.aX = true;
+        a(this.bh, this.bd);
+        this.bm = this.aY;
+        this.bj = this.bn = -1;
     }
 
     protected char[] ifa(int paramInt1, int paramInt2) throws JagacyException {
-        return null;
-        //return a(paramInt1, paramInt2, false);
+        return a(paramInt1, paramInt2, false);
+    }
+
+    public synchronized char[] a(int paramInt1, int paramInt2, boolean paramBoolean) throws JagacyException {
+        char[] arrayOfChar = new char[paramInt2];
+        if (paramInt2 == 0)
+            return arrayOfChar;
+        boolean bool = false;
+        boolean bool1 = false;
+        if (this.a9.inta() && !this.a9.trya(paramInt1)) {
+            int[] arrayOfInt = { paramInt1 };
+            this.bd.bytea(arrayOfInt);
+            bool = this.a9.chara(arrayOfInt[0]) ? false : true;
+            bool1 = this.a9.ifa(arrayOfInt[0]);
+        }
+        int i = this.a1.doa();
+        for (int b1 = 0; b1 < paramInt2; b1++) {
+            byte b2 = this.a1.a(paramInt1);
+            if (this.a9.trya(paramInt1)) {
+                bool = this.a9.chara(paramInt1) ? false : true;
+                bool1 = this.a9.ifa(paramInt1);
+                arrayOfChar[b1] = ' ';
+            } else if (b2 == 15 && !bool1) {
+                arrayOfChar[b1] = '>';
+            } else if (b2 == 14 && !bool1) {
+                arrayOfChar[b1] = '<';
+            } else if (b2 == 0 || b2 == 64 || b2 == 12 || b2 == 13 || b2 == 21 || b2 == 25 || (b2 & 0xFF) == -1 || b2 == 15 || b2 == 14) {
+                arrayOfChar[b1] = ' ';
+            } else if (bool && !this.bp && !paramBoolean) {
+                arrayOfChar[b1] = ' ';
+            } else if (b2 == 63) {
+                arrayOfChar[b1] = '�';
+            } else if (b2 == 28) {
+                arrayOfChar[b1] = '?';
+            } else if (b2 == 30) {
+                arrayOfChar[b1] = '?';
+            } else {
+                arrayOfChar[b1] = this.a1.ifa(paramInt1);
+            }
+            paramInt1 = ++paramInt1 % i;
+        }
+        return arrayOfChar;
     }
 
     protected int a(int paramInt1, int paramInt2, String paramString) throws JagacyException {

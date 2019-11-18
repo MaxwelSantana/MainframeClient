@@ -71,7 +71,7 @@ public class FeatureHelper {
 
     public static boolean isSelectable(int paramInt) { return ((paramInt & 0x100) != 0); }
 
-    //public static boolean isFeature(int paramInt) { return ((paramInt & true) != 0); }
+    public static boolean isFeature(int paramInt) { /*return ((paramInt & true) != 0);*/ return false; }
 
     public static int getForeground(int paramInt) { return paramInt >>> 24 & 0xFF; }
 

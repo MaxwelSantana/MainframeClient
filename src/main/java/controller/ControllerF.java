@@ -4,12 +4,13 @@ import config.Config;
 import config.JagacyProperties;
 import exception.JagacyException;
 import conduit.AbstractConduit;
-import helper.MyHelper;
+import helper.MyHelperD;
+import screen.ScreenBase;
 import utils.Loggable;
-import utils.Terminal;
+import utils.TerminalC;
 
 //com.jagacy.framework.f.class
-public abstract class Controller {
+public abstract class ControllerF {
 
     private int a6 = 25;
     private long a5;
@@ -25,17 +26,17 @@ public abstract class Controller {
     protected long a2;
     protected long aW;
     protected int aU;
-    protected MyHelper a9;
-    protected ScreenInfo a1;
+    protected MyHelperD a9;
+    protected ScreenBase a1;
     private boolean a8;
 
-    protected Controller(JagacyProperties paramJagacyProperties, Loggable paramLoggable) {
+    protected ControllerF(JagacyProperties paramJagacyProperties, Loggable paramLoggable) {
         this.aZ = paramLoggable;
         this.a7 = new Config(paramJagacyProperties);
         this.a8 = chara();
     }
 
-    protected void a(ScreenInfo parame, MyHelper paramd) {
+    protected void a(ScreenBase parame, MyHelperD paramd) {
         this.a1 = parame;
         this.a9 = paramd;
         this.aY = 0;
@@ -52,15 +53,15 @@ public abstract class Controller {
 
     protected abstract String getConduitClass();
 
-    public int newa() { return (this.ba == null) ? Terminal.maxWidth : this.ba.getWidth(); }
+    public int newa() { return (this.ba == null) ? TerminalC.maxWidth : this.ba.getWidth(); }
 
-    public int a() { return (this.ba == null) ? Terminal.maxHeight : this.ba.getHeight(); }
+    public int a() { return (this.ba == null) ? TerminalC.maxHeight : this.ba.getHeight(); }
 
-    public int inta() { return (this.ba == null) ? Terminal.maxWidth : this.ba.getMaxWidth(); }
+    public int inta() { return (this.ba == null) ? TerminalC.maxWidth : this.ba.getMaxWidth(); }
 
-    public int doa() { return (this.ba == null) ? Terminal.maxHeight : this.ba.getMaxHeight(); }
+    public int doa() { return (this.ba == null) ? TerminalC.maxHeight : this.ba.getMaxHeight(); }
 
-    protected abstract void e() throws JagacyException;
+    protected abstract void initAuxClasses() throws JagacyException;
 
     public synchronized void openController() throws JagacyException {
         if (this.a0)
@@ -80,14 +81,14 @@ public abstract class Controller {
         this.ba.setLogger(this.aZ);
         this.ba.open();
         this.aU = this.ba.getTerminalFlags();
-        e();
+        initAuxClasses();
         this.a0 = true;
     }
 
     protected abstract char[] ifa(int paramInt1, int paramInt2) throws JagacyException;
 
     public synchronized char[] a(int paramInt1, int paramInt2) throws JagacyException {
-        d();
+        checkControllerIsOpen();
         if (paramInt1 < 0 || paramInt1 >= this.a1.doa())
             throw new IllegalArgumentException("Invalid position: " + paramInt1);
         if (paramInt2 < 0 || paramInt1 + paramInt2 > this.a1.doa())
@@ -95,7 +96,7 @@ public abstract class Controller {
         return ifa(paramInt1, paramInt2);
     }
 
-    protected void d() throws JagacyException {
+    protected void checkControllerIsOpen() throws JagacyException {
         if (!this.a0)
             throw new JagacyException(3, "Controller is closed");
     }
@@ -105,7 +106,7 @@ public abstract class Controller {
     public void fora(int paramInt) throws JagacyException { ifa(paramInt, 0, null); }
 
     public synchronized void ifa(int paramInt1, int paramInt2, String paramString) throws JagacyException {
-        d();
+        checkControllerIsOpen();
         int i = a(paramInt1, paramInt2, paramString);
         if (i > 0 && this.aZ.isWatchEnabled()) {
             this.aZ.watch("Received " + i + " message(s)");
@@ -132,5 +133,26 @@ public abstract class Controller {
             this.aX = false;
             this.ba = null;
         }
+    }
+
+    public synchronized void voida() throws JagacyException {
+        checkControllerIsOpen();
+        if (!this.aX) {
+            this.aV = this.aW;
+            this.a5 = this.a3;
+        }
+    }
+
+    public synchronized boolean ifa() throws JagacyException {
+        boolean bool;
+        checkControllerIsOpen();
+        if (this.aX) {
+            bool = false;
+        } else if (this.aV == this.aW && this.a5 == this.a3) {
+            bool = false;
+        } else {
+            bool = true;
+        }
+        return bool;
     }
 }

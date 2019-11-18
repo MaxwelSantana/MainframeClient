@@ -3,25 +3,28 @@ package utils;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public abstract class Terminal {
+//com.jagacy.framework.c
+public abstract class TerminalC {
     public static int maxWidth = 80;
     public static int maxHeight = 24;
 
-    public static final Terminal s = new e();
+    public static int elsea = 2;
+
+    public static final TerminalC s = new e();
     private static Map q = (Map)new LinkedHashMap();
     private static Map doa = (Map)new LinkedHashMap();
 
-    public static Terminal getTerminal(String paramString) {
-        Terminal c1 = getTerminal2(paramString);
+    public static TerminalC getTerminal(String paramString) {
+        TerminalC c1 = getTerminal2(paramString);
         if (c1 == null)
             c1 = ifa(paramString);
         return c1;
     }
 
-    public static final Terminal getTerminal3 = new e();
+    public static final TerminalC getTerminal3 = new e();
 
-    public static Terminal getTerminal2(String paramString) { return (Terminal)q.get(paramString); }
-    public static Terminal ifa(String paramString) { return (Terminal)doa.get(paramString); }
+    public static TerminalC getTerminal2(String paramString) { return (TerminalC)q.get(paramString); }
+    public static TerminalC ifa(String paramString) { return (TerminalC)doa.get(paramString); }
 
     public int getMaxHeight() {
         return maxHeight;
@@ -31,9 +34,9 @@ public abstract class Terminal {
         return maxWidth;
     }
 
-    public static final Terminal d = new i(null);
+    public static final TerminalC d = new i(null);
 
-    private Terminal(Object o) {}
+    private TerminalC(Object o) {}
 
     public int getTerminalFlags() { return 0; };
 
@@ -42,7 +45,7 @@ public abstract class Terminal {
         q.put("IBM-3277-2", q);
     }
 
-    private static final class e extends Terminal {
+    private static final class e extends TerminalC {
         private e() { super(null); }
 
         public String toString() { return "IBM-3278-2"; }
@@ -308,7 +311,7 @@ public abstract class Terminal {
         public String toString() { return "Unknown"; }
     }
      */
-    private static final class i extends Terminal {
+    private static final class i extends TerminalC {
         private i(Object o) { super(null); }
 
         public String toString() { return "Unknown"; }
