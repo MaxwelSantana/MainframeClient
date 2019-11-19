@@ -7,6 +7,7 @@ import exception.JagacyException;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
 import ui.UserInterface;
+import utils.Key;
 import utils.Loggable;
 import utils.Logger;
 import utils.Util;
@@ -277,6 +278,92 @@ public abstract class AbstractSession {
 
         return as;
     }
+
+    public void writePosition(int paramInt1, int paramInt2, String paramString) throws JagacyException {
+        if (paramInt1 < 0 || paramInt1 >= getHeight())
+            throw new IllegalArgumentException("Invalid row: " + paramInt1);
+        if (paramInt2 < 0 || paramInt2 >= getWidth())
+            throw new IllegalArgumentException("Invalid column: " + paramInt2);
+        writeCursor(paramInt1, paramInt2);
+        writeString(paramString);
+    }
+
+    public Key writeKey(Key paramKey) throws JagacyException {
+        checkOpen();
+        checkLogoff();
+        if (paramKey == null)
+            throw new IllegalArgumentException("Null key");
+        if (isControllerKey(paramKey)) {
+            this.myIsInsert = false;
+            this.a.a();
+            this.myController.doa(paramKey);
+            /*
+            if (this.myUi != null) {
+                this.myUi.setLocked(a());
+                this.myUi.resetTime();
+                this.myUi.beginTime();
+            }*/
+            return paramKey;
+        }
+        processKey(paramKey);
+        if (this.myUi != null)
+            this.myUi.update();
+        return paramKey;
+    }
+
+    abstract void processKey(Key paramKey) throws JagacyException;
+
+    abstract boolean isControllerKey(Key paramKey);
+    /*
+    public void writePosition(Location paramLocation, String paramString) throws JagacyException {
+        if (paramLocation == null)
+            throw new IllegalArgumentException("Null location");
+        writePosition(paramLocation.getRow(), paramLocation.getColumn(), paramString);
+    }*/
+
+    public void writePosition(String paramString) throws JagacyException {
+        if (Util.isEmpty(paramString))
+            throw new IllegalArgumentException("Empty propertyPrefix");
+        int i = this.myProperties.getCardinal(Util.concat(paramString, "row"));
+        int j = this.myProperties.getCardinal(Util.concat(paramString, "column"));
+        String str = this.myProperties.get(Util.concat(paramString, "value"));
+        writePosition(i, j, str);
+    }
+
+    public void writePosition(String paramString1, String paramString2) throws JagacyException {
+        if (Util.isEmpty(paramString1))
+            throw new IllegalArgumentException("Empty propertyPrefix");
+        int i = this.myProperties.getCardinal(Util.concat(paramString1, "row"));
+        int j = this.myProperties.getCardinal(Util.concat(paramString1, "column"));
+        writePosition(i, j, paramString2);
+    }
+
+    public void writeCursor(int paramInt1, int paramInt2) throws JagacyException {
+        checkOpen();
+        checkLogoff();
+        if (paramInt1 < 0 || paramInt1 >= getHeight())
+            throw new IllegalArgumentException("Invalid row: " + paramInt1);
+        int i = getWidth();
+        if (paramInt2 < 0 || paramInt2 >= i)
+            throw new IllegalArgumentException("Invalid column: " + paramInt1);
+        this.myController.a(paramInt1 * i + paramInt2);
+    }
+
+    public void writeString(String paramString) throws JagacyException {
+        checkOpen();
+        checkLogoff();
+        if (!Util.isEmpty(paramString)) {
+            if (this.myIsInsert) {
+                insertString(paramString);
+            } else {
+                this.myController.a(paramString);
+            }
+            if (this.myUi != null)
+                this.myUi.update();
+        }
+    }
+
+    abstract void insertString(String paramString) throws JagacyException;
 
     public JagacyProperties getProperties() {
         return myProperties;

@@ -95,7 +95,7 @@ public class X509TrustManagerB implements X509TrustManager {
                 this.ifa.trace("Using empty keystore");
             }
         } else {
-            inputStream = getClass().getResourceAsStream("cacerts");
+            inputStream = getClass().getClassLoader().getResourceAsStream("cacerts");
             if (inputStream == null)
                 inputStream = getClass().getClassLoader().getResourceAsStream("cacerts");
             this.ifa.trace("Using default keystore");

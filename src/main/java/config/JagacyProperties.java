@@ -1,6 +1,8 @@
 package config;
 
+import com.sun.media.sound.InvalidFormatException;
 import exception.JagacyException;
+import utils.Key;
 import utils.Util;
 
 import java.io.BufferedInputStream;
@@ -182,9 +184,29 @@ public final class JagacyProperties {
         return i;
     }
 
+    public int getCardinal(String paramString) throws JagacyException { return a(paramString, get(paramString)); }
+
     public int getCardinal(String paramString, int paramInt) {
         String str = loadProperties(paramString);
         return (str == null) ? paramInt : loadProperties(paramString, str);
+    }
+
+    private int a(String paramString1, String paramString2) {
+        int i = 0;
+        try {
+            byte b = 10;
+            String str = paramString2.trim();
+            if (str.startsWith("0x") && str.length() > 2) {
+                b = 16;
+                str = str.substring(2);
+            }
+            i = Integer.parseInt(str, b);
+        } catch (NumberFormatException numberFormatException) {
+            //throw new InvalidFormatException("Could not parse int property " + paramString1 + "=" + paramString2);
+        }
+        //if (i < 0)
+            //throw new InvalidFormatException("Invalid negative property " + paramString1 + "=" + i);
+        return i;
     }
 
     public String get(String paramString1, String paramString2) {
@@ -313,6 +335,17 @@ public final class JagacyProperties {
     }
 
     private String loadProperties(String paramString) { return loadProperties(this.a1, paramString); }
+
+    public Key getKey(String paramString) throws exception.JagacyException {
+        String str = get(paramString);
+        if (str == null)
+            str = "null";
+        str = str.toUpperCase().trim();
+        Key key = Key.find(str);
+        if (key == null)
+            throw new exception.JagacyException(9, "Could not find key for property " + paramString + "=" + str);
+        return key;
+    }
 /*
     private int a(String paramString1, String paramString2) {
         int i = 0;

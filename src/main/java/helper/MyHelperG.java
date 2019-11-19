@@ -136,7 +136,7 @@ public final class MyHelperG extends MyHelperD {
         return i;
     }
 
-    int trya(int[] paramArrayOfint) {
+    public int trya(int[] paramArrayOfint) {
         int i = ifa(paramArrayOfint);
         if (i == 0) {
             paramArrayOfint[0] = -1;
@@ -147,7 +147,7 @@ public final class MyHelperG extends MyHelperD {
         return i;
     }
 
-    int doa(int[] paramArrayOfint) {
+    public int doa(int[] paramArrayOfint) {
         int i = a(paramArrayOfint);
         if (i == 0) {
             paramArrayOfint[0] = doa();
@@ -175,7 +175,7 @@ public final class MyHelperG extends MyHelperD {
         return gotoa(paramArrayOfint[0]);
     }
 
-    private int longa(int paramInt) {
+    public int longa(int paramInt) {
         int i = 0;
         if (paramInt <= 0)
             return i;
@@ -198,7 +198,7 @@ public final class MyHelperG extends MyHelperD {
         this.doa[paramInt] = this.doa[paramInt] & 0xFFFFFFDF;
     }
 
-    void a(int paramInt, byte paramByte) {
+    public void a(int paramInt, byte paramByte) {
         switch (paramByte) {
             case 0:
             elsea(paramInt);
@@ -215,12 +215,12 @@ public final class MyHelperG extends MyHelperD {
         }
     }
 
-    void voida(int paramInt) {
+    public void voida(int paramInt) {
         this.doa[paramInt] = a(this.doa[paramInt], 0);
         this.doa[paramInt] = fora(this.doa[paramInt], 0);
     }
 
-    void ifa(int paramInt, byte paramByte) {
+    public void ifa(int paramInt, byte paramByte) {
         switch (paramByte) {
             case -16:
             case -8:
@@ -272,7 +272,7 @@ public final class MyHelperG extends MyHelperD {
         }
     }
 
-    void doa(int paramInt, byte paramByte) {
+    public void doa(int paramInt, byte paramByte) {
         switch (paramByte) {
             case -16:
             case -8:

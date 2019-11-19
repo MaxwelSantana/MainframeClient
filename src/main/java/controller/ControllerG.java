@@ -6,9 +6,7 @@ import exception.JagacyException;
 import conduit.AbstractConduit;
 import helper.MyHelperD;
 import screen.ScreenBase;
-import utils.ByteBuffer;
-import utils.Loggable;
-import utils.TerminalC;
+import utils.*;
 
 //com.jagacy.framework.g.class
 public abstract class ControllerG {
@@ -122,6 +120,27 @@ public abstract class ControllerG {
 
     protected abstract void doa(String paramString) throws JagacyException;
 
+    protected abstract boolean a(Key paramKey);
+
+    protected abstract boolean ifa(Key paramKey) throws JagacyException;
+
+    protected abstract void fora(Key paramKey) throws JagacyException;
+
+    public synchronized void doa(Key paramKey) throws JagacyException {
+        if (this.a8 && paramKey.isWaitKey() && this.a6-- <= 0) {
+            this.aZ.fatal("Evaluation 25 page limit exceeded");
+            throw new JagacyException(3, "exception.controller.eval_exceeded", true);
+        }
+        checkControllerIsOpen();
+        if (a(paramKey))
+            throw new IllegalArgumentException("Unsupported key " + paramKey);
+        this.aZ.watch("Sending " + paramKey);
+        if (ifa(paramKey))
+        return;
+        fora(paramKey);
+        doa("Before update(s)");
+    }
+
     public synchronized void casea() throws JagacyException {
         try {
             if (this.a0) {
@@ -173,4 +192,15 @@ public abstract class ControllerG {
         throw new IllegalArgumentException("Invalid cursor position: " + paramInt);
         this.aY = paramInt;
     }
+
+    public synchronized void a(String paramString) throws JagacyException {
+        checkControllerIsOpen();
+        if (this.aX)
+            throw new JagacyException(11, "exception.keyboard.locked", true);
+        if (Util.isEmpty(paramString))
+            return;
+        ifa(paramString);
+    }
+
+    protected abstract void ifa(String paramString) throws JagacyException;
 }

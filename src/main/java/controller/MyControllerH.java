@@ -359,11 +359,257 @@ public class MyControllerH extends ControllerG implements IController {
     }
 
     private void fora(ByteBuffer paramByteBuffer) throws JagacyException {
+        boolean bool = false;
+        int i = this.aY;
+        int j = 0;
+        int k = this.a1.doa();
+        while (paramByteBuffer.getLength() > 0) {
+            byte b2;
+            byte b1 = paramByteBuffer.get();
+            if (b1 == 15) {
+                if (this.bg != null) {
+                    this.bg.ifa(false);
+                    this.bg.a(i++, (byte)15);
+                    i %= k;
+                }
+                continue;
+            }
+            if (b1 == 14) {
+                if (this.bg != null) {
+                    this.bg.ifa(false);
+                    this.bg.a(i++, (byte)14);
+                    this.bg.ifa(true);
+                    i %= k;
+                    continue;
+                }
+                throw new JagacyException(0, "exception.controller.dbcs", true);
+            }
+            if (b1 == 1 || b1 == 2)
+                continue;
+            if (b1 == 5) {
+                this.aZ.watch("Tab order");
+                boolean bool1 = true;
+                while (i < k && (!this.a9.newa(i) || this.a9.a(i))) {
+                    if (this.a9.newa(i)) {
+                        bool1 = false;
+                    } else if (bool && bool1) {
+                        this.a1.doa(i);
+                    }
+                    i++;
+                }
+                if (i < k)
+                    i++;
+                i %= k;
+                bool = false;
+                this.aW++;
+                continue;
+            }
+            bool = false;
+            if (b1 == 29) {
+                byte b3 = a(paramByteBuffer.get());
+                this.bd.longa(i);
+                this.bd.chara(i);
+                a(b3, i);
+                this.aZ.watch("Start Field order, pos=" + i + ", attr=" + Util.toHex(b3) + ", size=" + k);
+                this.aW++;
+                i = ++i % k;
+                if (this.bg != null)
+                    this.bg.a(true);
+                continue;
+            }
+            if (b1 == 17) {
+                int m = trya(paramByteBuffer);
+                k = this.a1.doa();
+                this.aZ.watch("Set Buffer Address order, old pos=" + i + ", new pos=" + m + ", size=" + k);
+                i = m;
+                continue;
+            }
+            if (b1 == 19) {
+                this.aZ.watch("Insert Cursor order");
+                this.aY = this.bm = i;
+                this.a3++;
+                continue;
+            }
+            if (b1 == 60) {
+                this.aZ.watch("Repeat to address order");
+                j = trya(paramByteBuffer);
+                k = this.a1.doa();
+                b2 = paramByteBuffer.get();
+                if (b2 == 8) {
+                    this.aZ.watch("GE Suborder");
+                    paramByteBuffer.addStart(1);
+                    b2 = 63;
+                }
+                if (j > i) {
+                    this.a1.a(i, j, b2);
+                    this.a9.ifa(i, j);
+                } else {
+                    this.a1.a(i, k, b2);
+                    this.a9.ifa(i, k);
+                    this.a1.a(0, j, b2);
+                    this.a9.ifa(0, j);
+                }
+                this.aW++;
+                i = j % k;
+                continue;
+            }
+            if (b1 == 18) {
+                this.aZ.watch("Erase Unprotected to Address order");
+                j = trya(paramByteBuffer);
+                k = this.a1.doa();
+                fora(i, j);
+                i = j % k;
+                this.aW++;
+                continue;
+            }
+            if (b1 == 41) {
+                this.aZ.watch("SFE Order");
+                this.bd.longa(i);
+                this.bd.chara(i);
+                byte b3 = 0;
+                int m = paramByteBuffer.get() & 0xFF;
+                for (byte b4 = 0; b4 < m; b4++) {
+                    byte b5 = paramByteBuffer.get();
+                    byte b6 = paramByteBuffer.get();
+                    if ((b5 & 0xFF) == 192) {
+                        b3 = a(b6);
+                    } else if ((b5 & 0xFF) == 65) {
+                        this.bd.a(i, b6);
+                    } else if ((b5 & 0xFF) == 66) {
+                        this.bd.ifa(i, b6);
+                    } else if ((b5 & 0xFF) == 67) {
+                        this.aZ.watch("DBCS Character Set");
+                        if (this.bg != null)
+                            this.bg.a(((b6 & 0xFF) == 248));
+                        this.aW++;
+                    } else if ((b5 & 0xFF) == 254) {
+                        this.aZ.watch("DBCS Input Control");
+                        if (this.bg != null)
+                            this.bg.a(((b6 & 0xFF) == 1));
+                        this.aW++;
+                    } else if ((b5 & 0xFF) == 69) {
+                        this.bd.doa(i, b6);
+                    }
+                }
+                a(b3, i);
+                this.aW++;
+                i = ++i % k;
+                continue;
+            }
+            if (b1 == 44) {
+                this.aZ.watch("MF Order");
+                int m = paramByteBuffer.get() & 0xFF;
+                int n = -1;
+                if (this.a9.newa(i)) {
+                    for (byte b3 = 0; b3 < m; b3++) {
+                        byte b4 = paramByteBuffer.get();
+                        byte b5 = paramByteBuffer.get();
+                        if ((b4 & 0xFF) == 192) {
+                            n = a(b5) & 0xFF;
+                        } else if ((b4 & 0xFF) == 65) {
+                            this.bd.a(i, b5);
+                            this.aW++;
+                        } else if ((b4 & 0xFF) == 66) {
+                            this.bd.ifa(i, b5);
+                            this.aW++;
+                        } else if ((b4 & 0xFF) == 67) {
+                            this.aZ.watch("DBCS Character Set");
+                            if (this.bg != null)
+                                this.bg.a(((b5 & 0xFF) == 248));
+                            this.aW++;
+                        } else if ((b4 & 0xFF) == 254) {
+                            this.aZ.watch("DBCS Input Control");
+                            if (this.bg != null)
+                                this.bg.a(((b5 & 0xFF) == 1));
+                            this.aW++;
+                        } else if ((b4 & 0xFF) == 69) {
+                            this.bd.doa(i, b5);
+                            this.aW++;
+                        }
+                    }
+                    if (n != -1) {
+                        a((byte)n, i);
+                        this.aW++;
+                        i = ++i % k;
+                        continue;
+                    }
+                    if (m == 0)
+                        i = ++i % k;
+                    continue;
+                }
+                paramByteBuffer.addStart(2 * m);
+                continue;
+            }
+            if (b1 == 40) {
+                this.aZ.watch("SA Order");
+                paramByteBuffer.addStart(2);
+                continue;
+            }
+            if (b1 == 8) {
+                this.aZ.watch("Main GE Order");
+                paramByteBuffer.addStart(1);
+                b2 = 63;
+            } else {
+                b2 = b1;
+                bool = true;
+            }
+            if (this.bs.isSscpLu() && b2 == 21) {
+                i = (i / newa() + 1) * newa() % this.a1.doa();
+                this.a3++;
+            } else {
+                this.a9.trya(i);
+                this.a1.a(i, b2);
+            }
+            this.aW++;
+            i = ++i % k;
+        }
+        if (this.bs.isSscpLu())
+            this.aY = this.bm = i;
+    }
 
+    private int trya(ByteBuffer paramByteBuffer) throws JagacyException {
+        int i = 0;
+        byte b1 = paramByteBuffer.get();
+        byte b2 = paramByteBuffer.get();
+        if ((b1 & 0xC0) == 0) {
+            i = ((b1 & 0xFF) << 8) + (b2 & 0xFF);
+        } else {
+            byte b3 = bk[b1 & 0xFF];
+            byte b4 = bk[b2 & 0xFF];
+            if (b3 == -1 || b4 == -1) {
+                i = ((b1 & 0x3F) << 6) + (b2 & 0x3F);
+            } else {
+                i = (b3 & 0xFF) * n.length + (b4 & 0xFF);
+            }
+        }
+        if (i < 0 || i >= this.a1.doa()) {
+            if (i >= 0 && !this.br && i < doa() * inta()) {
+                this.aZ.watch("Auto switch to alt screen");
+                this.br = true;
+                return i;
+            }
+            this.aZ.watch("Invalid address " + i);
+            i = 0;
+        }
+        return i;
     }
 
     protected void doa(String paramString) throws JagacyException {
 
+    }
+
+    private byte a(byte paramByte) {
+        int i = bk[paramByte & 0xFF];
+        if (i == -1) {
+            i = paramByte & 0x3F | 0x40;
+            if (((((i & 0xF) > 0) ? 1 : 0) & (((i & 0xF) < 10) ? 1 : 0)) != 0)
+                i |= 0x80;
+            if ((i & 0x3F) == 33)
+                i &= 0x7F;
+            if ((i & 0x3F) == 48)
+                i |= 0x80;
+        }
+        return (byte)i;
     }
 
     private void doa(byte paramByte) throws JagacyException {
@@ -678,5 +924,20 @@ public class MyControllerH extends ControllerG implements IController {
         }
         this.aZ.watch("Unknown type " + Util.toHex(b2));
         paramByteBuffer.addStart(paramInt);
+    }
+
+    public boolean a(Key paramKey) { return !(paramKey.getId() < bt.length && bt[paramKey.getId()] != 0); }
+
+    //TODO
+    protected boolean ifa(Key paramKey) throws JagacyException {
+        return false;
+    }
+
+    protected void fora(Key paramKey) throws JagacyException {
+
+    }
+
+    protected void ifa(String paramString) throws JagacyException {
+
     }
 }

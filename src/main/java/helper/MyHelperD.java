@@ -67,7 +67,7 @@ public abstract class MyHelperD extends FeatureHelper {
     }
 
     public void a() {
-        byte b = 0;
+        int b = 0;
         int i = this.doa.length;
         while (b < i) {
             a(b, false);

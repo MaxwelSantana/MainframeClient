@@ -28,7 +28,7 @@ public class ScreenA extends ScreenB {
 
     private boolean newa(int paramInt) { return !(this.casea[paramInt] != 1 && this.casea[paramInt] != 0); }
 
-    void a(boolean paramBoolean1, boolean paramBoolean2) {
+    public void a(boolean paramBoolean1, boolean paramBoolean2) {
         if (paramBoolean1) {
             this.gotoa = paramBoolean2 ? 20 : 10;
         } else {
@@ -36,7 +36,7 @@ public class ScreenA extends ScreenB {
         }
     }
 
-    void ifa(boolean paramBoolean) {
+    public void ifa(boolean paramBoolean) {
         if (paramBoolean) {
             if (this.gotoa == 0 || this.gotoa == 11) {
                 this.gotoa = 10;
@@ -50,7 +50,7 @@ public class ScreenA extends ScreenB {
         }
     }
 
-    void a(boolean paramBoolean) {
+    public void a(boolean paramBoolean) {
         if (this.gotoa == 10 || this.gotoa == 20) {
             this.gotoa = paramBoolean ? 20 : 10;
         } else if (this.gotoa == 11 || this.gotoa == 21) {
@@ -153,7 +153,7 @@ public class ScreenA extends ScreenB {
         this.casea[paramInt] = bool;
     }
 
-    void a(int paramInt1, int paramInt2) {
+    public void a(int paramInt1, int paramInt2) {
         Arrays.fill(this.doa, paramInt1, paramInt2, (byte)0);
         Arrays.fill(this.casea, paramInt1, paramInt2, 1);
     }
@@ -165,7 +165,7 @@ public class ScreenA extends ScreenB {
         Arrays.fill(this.casea, 0, this.casea.length, bool);
     }
 
-    byte[] a(char paramChar) throws JagacyException {
+    public byte[] a(char paramChar) throws JagacyException {
         byte[] arrayOfByte = this.fora.a(String.valueOf(paramChar));
         if (arrayOfByte.length == 4) {
             byte[] arrayOfByte1 = new byte[2];
@@ -176,9 +176,9 @@ public class ScreenA extends ScreenB {
         return arrayOfByte;
     }
 
-    boolean trya(int paramInt) { return !newa(paramInt); }
+    public boolean trya(int paramInt) { return !newa(paramInt); }
 
-    byte[][] ifa(int paramInt1, int paramInt2) {
+    public byte[][] ifa(int paramInt1, int paramInt2) {
         ArrayList<byte[]> arrayList = new ArrayList();
         for (byte b1 = 0; b1 < paramInt2; b1++) {
             if (newa(paramInt1)) {
